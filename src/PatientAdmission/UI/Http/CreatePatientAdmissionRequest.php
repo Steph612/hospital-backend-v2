@@ -2,30 +2,30 @@
 
 declare(strict_types=1);
 
-namespace App\PatientAdmission\Application\Create;
+namespace App\PatientAdmission\UI\Http;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Command applicatif
+ * DTO d’entrée HTTP
  */
-final readonly class CreatePatientAdmissionCommand
+final readonly class CreatePatientAdmissionRequest
 {
     public function __construct(
         #[Assert\NotBlank]
         #[Assert\Uuid]
-        public string $patientId,
+        public string $patientId = '',
         #[Assert\NotBlank]
         #[Assert\Length(max: 20)]
-        public string $hospitalUnitCode,
+        public string $hospitalUnitCode = '',
         #[Assert\NotBlank]
-        public string $admittedAt,
+        public string $admittedAt = '',
         #[Assert\NotBlank]
         #[Assert\Length(max: 255)]
-        public string $reason,
+        public string $reason = '',
         #[Assert\NotBlank]
         #[Assert\Uuid]
-        public string $createdBy,
+        public string $createdBy = '',
     ) {
     }
 }
