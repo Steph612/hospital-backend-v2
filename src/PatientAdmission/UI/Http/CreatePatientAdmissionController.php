@@ -61,19 +61,7 @@ final readonly class CreatePatientAdmissionController
             );
         }
 
-        try {
-            $response = $this->handler->handle($command);
-        } catch (PatientAlreadyAdmitted $exception) {
-            return new JsonResponse(
-                ['message' => $exception->getMessage()],
-                JsonResponse::HTTP_CONFLICT
-            );
-        } catch (\InvalidArgumentException $exception) {
-            return new JsonResponse(
-                ['message' => $exception->getMessage()],
-                JsonResponse::HTTP_UNPROCESSABLE_ENTITY
-            );
-        }
+        $response = $this->handler->handle($command);
 
         return new JsonResponse(
             [
