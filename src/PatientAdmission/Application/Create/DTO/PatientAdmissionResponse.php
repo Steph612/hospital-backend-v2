@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\PatientAdmission\Application\Create;
+namespace App\PatientAdmission\Application\Create\DTO;
 
 /**
  * DTO de sortie applicatif

@@ -4,19 +4,22 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\PatientAdmission\Application\Create;
 
-use App\PatientAdmission\Application\Create\CreatePatientAdmissionCommand;
-use App\PatientAdmission\Application\Create\CreatePatientAdmissionHandler;
+use App\PatientAdmission\Application\Create\Command\CreatePatientAdmissionCommand;
+use App\PatientAdmission\Application\Create\Handler\CreatePatientAdmissionHandler;
 use App\PatientAdmission\Domain\Entity\PatientAdmission;
 use App\PatientAdmission\Domain\Exception\PatientAlreadyAdmitted;
 use App\PatientAdmission\Domain\Repository\PatientAdmissionRepositoryInterface;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 final class CreatePatientAdmissionHandlerTest extends TestCase
 {
     public function test_it_creates_a_patient_admission_when_patient_has_no_active_admission(): void
     {
         $repository = new InMemoryPatientAdmissionRepository(existsActiveAdmission: false);
-        $handler = new CreatePatientAdmissionHandler($repository);
+        $messageBus = $this->createMock(MessageBusInterface::class);
+        # $messageBus->expects($this->once())->method('dispatch');
+        $handler = new CreatePatientAdmissionHandler($repository, $messageBus);
 
         $response = $handler->handle(new CreatePatientAdmissionCommand(
             patientId: '11111111-1111-4111-8111-111111111111',
@@ -38,7 +41,8 @@ final class CreatePatientAdmissionHandlerTest extends TestCase
     public function test_it_rejects_patient_when_an_active_admission_already_exists(): void
     {
         $repository = new InMemoryPatientAdmissionRepository(existsActiveAdmission: true);
-        $handler = new CreatePatientAdmissionHandler($repository);
+        $messageBus = $this->createMock(MessageBusInterface::class);
+        $handler = new CreatePatientAdmissionHandler($repository, $messageBus);
 
         $this->expectException(PatientAlreadyAdmitted::class);
         $this->expectExceptionMessage('Patient "11111111-1111-4111-8111-111111111111" already has an active admission.');
@@ -55,7 +59,8 @@ final class CreatePatientAdmissionHandlerTest extends TestCase
     public function test_it_rejects_invalid_admitted_at_format(): void
     {
         $repository = new InMemoryPatientAdmissionRepository(existsActiveAdmission: false);
-        $handler = new CreatePatientAdmissionHandler($repository);
+        $messageBus = $this->createMock(MessageBusInterface::class);
+        $handler = new CreatePatientAdmissionHandler($repository, $messageBus);
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Field "admittedAt" must be a valid ISO-8601 datetime.');

@@ -2,18 +2,21 @@
 
 declare(strict_types=1);
 
-namespace App\PatientAdmission\Application\Create;
+namespace App\PatientAdmission\Application\Create\Handler;
 
-use App\PatientAdmission\Application\Create\CreatePatientAdmissionCommand;
-use App\PatientAdmission\Application\Create\PatientAdmissionResponse;
+use App\PatientAdmission\Application\Create\Command\CreatePatientAdmissionCommand;
+use App\PatientAdmission\Application\Create\DTO\PatientAdmissionResponse;
+use App\PatientAdmission\Application\Create\Event\PatientAdmissionCreated;
 use App\PatientAdmission\Domain\Entity\PatientAdmission;
 use App\PatientAdmission\Domain\Exception\PatientAlreadyAdmitted;
 use App\PatientAdmission\Domain\Repository\PatientAdmissionRepositoryInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 final readonly class CreatePatientAdmissionHandler
 {
     public function __construct(
         private PatientAdmissionRepositoryInterface $patientAdmissionRepository,
+        private MessageBusInterface $messageBus,
     ) {
     }
 
@@ -38,6 +41,14 @@ final readonly class CreatePatientAdmissionHandler
         );
 
         $this->patientAdmissionRepository->save($patientAdmission);
+
+        $this->messageBus->dispatch(
+            new PatientAdmissionCreated(
+                admissionId: $patientAdmission->id(),
+                patientId: $patientAdmission->patientId(),
+                createdAt: $patientAdmission->createdAt()->format(\DateTimeInterface::ATOM),
+            )
+        );
 
         return new PatientAdmissionResponse(
             id: $patientAdmission->id(),

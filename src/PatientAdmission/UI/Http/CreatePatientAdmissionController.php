@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\PatientAdmission\UI\Http;
 
-use App\PatientAdmission\Application\Create\CreatePatientAdmissionCommand;
-use App\PatientAdmission\Application\Create\CreatePatientAdmissionHandler;
+use App\PatientAdmission\Application\Create\Command\CreatePatientAdmissionCommand;
+use App\PatientAdmission\Application\Create\Handler\CreatePatientAdmissionHandler;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
